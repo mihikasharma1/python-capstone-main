@@ -1,0 +1,5 @@
+google-genai>=1.0.0
+python-dotenv
+chromadb
+sentence-transformers
+pytest
