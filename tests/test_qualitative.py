@@ -42,12 +42,26 @@ def test_answer_reports_not_found_below_threshold(tmp_path):
 def test_answer_calls_gemini_with_context(mock_client, tmp_path):
     agent = QualitativeAgent.__new__(QualitativeAgent)
     agent.collection = make_test_collection(tmp_path)
+
     mock_client.models.generate_content.return_value = MagicMock(
         text="Employees must train annually [security_policy.md#0]."
     )
-
     result = agent.answer("What security training is required?")
 
     assert "annually" in result.answer
     assert result.citations
     mock_client.models.generate_content.assert_called_once()
+
+
+@patch("agents.qualitative._client")
+def test_answer_handles_empty_gemini_response(mock_client, tmp_path):
+    """Regression test: a model that spends its whole token budget on internal
+    reasoning can return text=None — this must degrade gracefully, not crash."""
+    agent = QualitativeAgent.__new__(QualitativeAgent)
+    agent.collection = make_test_collection(tmp_path)
+
+    mock_client.models.generate_content.return_value = MagicMock(text=None)
+    result = agent.answer("What security training is required?")
+
+    assert result.answer
+    assert result.found is True

@@ -57,9 +57,11 @@ class QualitativeAgent:
 
         context = "\n\n".join(f"[{c.source}#{c.chunk_index}] {c.text}" for c in relevant)
         prompt = (
-            "Answer the question using ONLY the context below. "
-            "Cite sources inline like [filename#chunk_index]. "
-            "If the context doesn't fully answer the question, say so explicitly.\n\n"
+            "Answer the question using ONLY the context below. Cite sources inline like "
+            "[filename#chunk_index]. If the context contains a relevant fact, policy, target, or "
+            "figure — even if it doesn't fully resolve the question — state that fact clearly and "
+            "cite it, rather than declining. Only say the context doesn't answer the question if "
+            "NOTHING in it is relevant at all.\n\n"
             f"Context:\n{context}\n\nQuestion: {query}"
         )
         response = call_with_progress(

@@ -9,6 +9,12 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from config import DB_PATH
 
 REGIONS = ["North America", "EMEA", "APAC", "LATAM"]
+REGION_CHURN_RATE = {
+    "North America": 0.08,
+    "EMEA": 0.14,
+    "APAC": 0.18,
+    "LATAM": 0.28,
+}
 random.seed(42)  # reproducible synthetic data
 
 
@@ -46,10 +52,10 @@ def build():
     """)
 
     customers = []
-    for cid in range(1, 41):
+    for cid in range(1, 61):
         region = random.choice(REGIONS)
         signup = date(2023, 1, 1) + timedelta(days=random.randint(0, 700))
-        status = random.choices(["active", "churned"], weights=[0.8, 0.2])[0]
+        status = "churned" if random.random() < REGION_CHURN_RATE[region] else "active"
         customers.append((cid, f"Customer {cid}", region, signup.isoformat(), status))
     cur.executemany("INSERT INTO customers VALUES (?, ?, ?, ?, ?)", customers)
 

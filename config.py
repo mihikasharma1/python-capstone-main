@@ -14,10 +14,10 @@ BASE_DIR = Path(__file__).resolve().parent
 DOCS_DIR = BASE_DIR / "data" / "docs"
 CHROMA_DIR = BASE_DIR / "chroma_store"
 
-GENERATION_MODEL = "gemini-3.6-flash"
+GENERATION_MODEL = "gemini-3.5-flash-lite"
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
 
 TOP_K = 3
-RELEVANCE_THRESHOLD = 0.45
+RELEVANCE_THRESHOLD = 0.4
 
 DB_PATH = BASE_DIR / "data" / "company.db"

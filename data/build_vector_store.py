@@ -12,14 +12,21 @@ CHUNK_SIZE = 500
 CHUNK_OVERLAP = 50
 
 
-def chunk_text(text, size=CHUNK_SIZE, overlap=CHUNK_OVERLAP):
-    chunks = []
-    start = 0
-    while start < len(text):
-        chunks.append(text[start:start + size])
-        start += size - overlap
-    return [c.strip() for c in chunks if c.strip()]
-
+def chunk_text(text: str, min_chunk_size: int = 200) -> list[str]:
+    """Split on paragraph breaks so a single policy statement, threshold, or process
+    description never gets sliced across an arbitrary character-count boundary. Tiny
+    paragraphs (e.g. a heading on its own line) get merged forward so we don't index a
+    near-empty, low-signal chunk on its own."""
+    paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+    chunks, buffer = [], ""
+    for p in paragraphs:
+        buffer = f"{buffer}\n\n{p}".strip() if buffer else p
+        if len(buffer) >= min_chunk_size:
+            chunks.append(buffer)
+            buffer = ""
+    if buffer:
+        chunks.append(buffer)
+    return chunks
 
 def build():
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
